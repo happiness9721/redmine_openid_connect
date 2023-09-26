@@ -139,12 +139,23 @@ class OicSession < ActiveRecord::Base
     return true if kc_is_in_role 
   end
 
+  def check_cognito_role(role)
+    # cognito way...
+    cognito_is_in_role = false
+    if user["cognito:groups"].present?
+      cognito_is_in_role = user["cognito:groups"].include?(role)
+    end
+    return true if cognito_is_in_role
+  end
+
   def authorized?
     if client_config['group'].blank?
       return true
     end
 
     return true if check_keycloak_role client_config['group']
+
+    return true if check_cognito_role client_config['group']
 
     return false if !user["member_of"] && !user["roles"]
 
@@ -168,6 +179,8 @@ class OicSession < ActiveRecord::Base
       end
       # keycloak way...
       return true if check_keycloak_role client_config['admin_group']
+      # cognito way...
+      return true if check_cognito_role client_config['admin_group']
     end
     
     return false
