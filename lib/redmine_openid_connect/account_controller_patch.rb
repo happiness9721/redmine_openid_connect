@@ -104,8 +104,8 @@ module RedmineOpenidConnect
 
           user.login = user_info["username"] || user_info["user_name"] || user_info["nickname"] || user_info["preferred_username"] || user_info["email"]
 
-          firstname = user_info["given_name"]
-          lastname = user_info["family_name"]
+          firstname = user_info["given_name"] || user.login
+          lastname = user_info["family_name"] || user.login
 
           if (firstname.nil? || lastname.nil?) && user_info["name"]
             parts = user_info["name"].split
